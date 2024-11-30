@@ -1,23 +1,30 @@
 import os
-from translator import Translator
+from translator import DocumentTranslator
 
-def main():
-    endpoint = os.getenv("AZURE_TRANSLATOR_ENDPOINT")
-    api_key = os.getenv("AZURE_TRANSLATOR_KEY")
+def run_translation():
+    # Recupera informações de ambiente para autenticação
+    translator_endpoint = os.getenv("TRANSLATOR_API_ENDPOINT")
+    translator_key = os.getenv("TRANSLATOR_API_KEY")
 
-    translator = Translator(endpoint, api_key)
+    # Instancia o tradutor com os parâmetros necessários
+    translator_service = DocumentTranslator(translator_endpoint, translator_key)
 
-    source_url = "https://example.com/path/to/your/document.pdf"  # URL do documento a ser traduzido
-    target_language = "fr"  # Código do idioma de destino (ex: 'fr' para francês)
-    display_name = "Technical Article Translation"
+    # Configurações da tradução
+    document_url = "https://example.com/path/to/document.pdf"  # URL do arquivo para tradução
+    target_language_code = "fr"  # Código ISO do idioma de destino (exemplo: 'fr' para francês)
+    job_name = "Article Translation Task"
 
-    translation_result = translator.translate_documents(source_url, target_language, display_name)
+    # Inicia a tradução do documento
+    translation_job = translator_service.submit_translation(
+        document_url, target_language_code, job_name
+    )
 
-    if translation_result:
-        print(f"Translation job ID: {translation_result.id}")
-        print("Translation status:", translation_result.status)
+    # Verifica se a tradução foi iniciada com sucesso
+    if translation_job:
+        print(f"Job ID: {translation_job.id}")
+        print(f"Status da tradução: {translation_job.status}")
     else:
-        print("Translation failed.")
+        print("Não foi possível iniciar a tradução.")
 
 if __name__ == "__main__":
-    main()
+    run_translation()
